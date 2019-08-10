@@ -1,9 +1,11 @@
-# sample-web-app
+# sample-web-app with Laravel x Reactjs
+# This is my very first project together with these two frameworks.
+
 PHP Version: PHP 7.3.7
 Database: SQLITE
 
 User details:
-    admin account
+    admin account->
         email: admin@gmail.com, password: admin1234
 
 This project is a Single Page Application.
