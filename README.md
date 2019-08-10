@@ -1,4 +1,4 @@
-# sample-web-app with Laravel x Reactjs
+# A simple web app with Laravel x Reactjs
 # This is my very first project together with these two frameworks.
 
 PHP Version: PHP 7.3.7
