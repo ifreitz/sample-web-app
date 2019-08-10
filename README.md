@@ -13,7 +13,7 @@ Integrate laravel Rest API's.
 
 I may not include image manipulation because of the type of database I used which is SQLITE.
 
-How these commands to run the application:
+Execute these commands to run the application:
 
 > sudo npm run dev
 
