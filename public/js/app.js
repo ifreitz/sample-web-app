@@ -65493,6 +65493,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -65535,12 +65537,15 @@ function (_Component) {
       totalUsers: 0,
       numberPage: 0,
       currentPage: 1,
+      search: '',
       users: []
     };
     _this.handleLogout = _this.handleLogout.bind(_assertThisInitialized(_this));
     _this.handleDeleteUser = _this.handleDeleteUser.bind(_assertThisInitialized(_this));
     _this.handleEditUser = _this.handleEditUser.bind(_assertThisInitialized(_this));
     _this.handlePaginate = _this.handlePaginate.bind(_assertThisInitialized(_this));
+    _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
+    _this.handleFieldChange = _this.handleFieldChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65573,16 +65578,44 @@ function (_Component) {
       var instances = M.Sidenav.init(elems);
     }
   }, {
+    key: "handleFieldChange",
+    value: function handleFieldChange(event) {
+      this.setState(_defineProperty({}, event.target.name, event.target.value));
+    }
+  }, {
+    key: "handleSearch",
+    value: function handleSearch() {
+      var _this3 = this;
+
+      if (this.state.search === '') {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(1)).then(function (response) {
+          _this3.setState({
+            users: response.data.data,
+            totalUsers: response.data.total,
+            numberPage: response.data.last_page
+          });
+        });
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/search-users/".concat(this.state.search)).then(function (response) {
+          _this3.setState({
+            users: response.data.data,
+            totalUsers: response.data.total,
+            numberPage: response.data.last_page
+          });
+        });
+      }
+    }
+  }, {
     key: "handlePaginate",
     value: function handlePaginate(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       var page = event.target.innerText;
       if (page == 'next') page = this.state.currentPage + 1;else if (page == 'prev') page = this.state.currentPage - 1;
 
       if (page > 0 && page <= this.state.numberPage) {
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(page)).then(function (response) {
-          _this3.setState({
+          _this4.setState({
             users: response.data.data
           });
         });
@@ -65626,7 +65659,7 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!sessionStorage.getItem('admin')) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Redirect"], {
@@ -65723,7 +65756,34 @@ function (_Component) {
         }
       }, this.state.description))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "content"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h6", null, "List of registered users"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("table", {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "row",
+        style: {
+          alignItems: 'center',
+          justifyContent: 'flex-end'
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h6", {
+        className: "hide-on-small-only",
+        style: {
+          position: 'absolute',
+          left: '20px'
+        }
+      }, "List of registered users"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        placeholder: "Name",
+        id: "search",
+        name: "search",
+        type: "text",
+        className: "validate",
+        style: {
+          width: '250px'
+        },
+        value: this.state.search,
+        onChange: this.handleFieldChange
+      }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "waves-effect waves-dark btn white",
+        type: "submit",
+        onClick: this.handleSearch
+      }, "\uD83D\uDD0E")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("table", {
         className: "highlight responsive-table"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Name"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Email"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Gender"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Description"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Action"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tbody", {
         id: "table-content"
@@ -65734,12 +65794,12 @@ function (_Component) {
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.name), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.email), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.gender), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.description), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
           className: "waves-effect waves-light btn",
           onClick: function onClick() {
-            return _this4.handleEditUser(user);
+            return _this5.handleEditUser(user);
           }
         }, "Edit"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
           className: "waves-effect waves-light btn",
           onClick: function onClick() {
-            return _this4.handleDeleteUser(user.id);
+            return _this5.handleDeleteUser(user.id);
           }
         }, "Delete")));
       }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
@@ -65898,7 +65958,7 @@ function (_Component) {
       }, "Go Back"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("hr", {
         className: "row margin-zero"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
-        className: "registration-form z-depth-3",
+        className: "registration-form z-depth-1",
         onSubmit: this.handleOnSubmit
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "Edit User")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
@@ -66153,6 +66213,7 @@ function (_Component) {
   _createClass(GuestDashboard, [{
     key: "handleLogout",
     value: function handleLogout() {
+      sessionStorage.removeItem('guest');
       this.props.history.push('/');
     }
   }, {
@@ -66293,7 +66354,7 @@ function (_Component) {
           paddingLeft: '33px'
         }
       }, this.state.description))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
-        className: "registration-form z-depth-3",
+        className: "registration-form z-depth-1",
         onSubmit: this.handleOnSubmit
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "My Information")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
@@ -66581,7 +66642,7 @@ function (_Component) {
       }, "Login")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("hr", {
         className: "row margin-zero"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        className: "login-forms z-depth-3"
+        className: "login-forms z-depth-2"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
         id: "tabs-swipe-demo",
         className: "tabs"
@@ -66882,6 +66943,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -66917,9 +66980,12 @@ function (_Component) {
       users: [],
       totalUsers: 0,
       numberPage: 0,
-      currentPage: 1
+      currentPage: 1,
+      search: ''
     };
     _this.handlePaginate = _this.handlePaginate.bind(_assertThisInitialized(_this));
+    _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
+    _this.handleFieldChange = _this.handleFieldChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66937,16 +67003,44 @@ function (_Component) {
       });
     }
   }, {
+    key: "handleSearch",
+    value: function handleSearch() {
+      var _this3 = this;
+
+      if (this.state.search === '') {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(1)).then(function (response) {
+          _this3.setState({
+            users: response.data.data,
+            totalUsers: response.data.total,
+            numberPage: response.data.last_page
+          });
+        });
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/search-users/".concat(this.state.search)).then(function (response) {
+          _this3.setState({
+            users: response.data.data,
+            totalUsers: response.data.total,
+            numberPage: response.data.last_page
+          });
+        });
+      }
+    }
+  }, {
+    key: "handleFieldChange",
+    value: function handleFieldChange(event) {
+      this.setState(_defineProperty({}, event.target.name, event.target.value));
+    }
+  }, {
     key: "handlePaginate",
     value: function handlePaginate(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       var page = event.target.innerText;
       if (page == 'next') page = this.state.currentPage + 1;else if (page == 'prev') page = this.state.currentPage - 1;
 
       if (page > 0 && page <= this.state.numberPage) {
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(page)).then(function (response) {
-          _this3.setState({
+          _this4.setState({
             users: response.data.data
           });
         });
@@ -67008,7 +67102,28 @@ function (_Component) {
         className: "row margin-zero"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "landing-page-table"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("table", {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "row",
+        style: {
+          alignItems: 'center',
+          justifyContent: 'flex-end'
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        placeholder: "Name",
+        id: "search",
+        name: "search",
+        type: "text",
+        className: "validate",
+        style: {
+          width: '250px'
+        },
+        value: this.state.search,
+        onChange: this.handleFieldChange
+      }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+        className: "waves-effect waves-dark btn white",
+        type: "submit",
+        onClick: this.handleSearch
+      }, "\uD83D\uDD0E")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("table", {
         className: "highlight responsive-table"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Name"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Email"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Gender"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Description"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tbody", null, users.map(function (user) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", {

@@ -103,6 +103,16 @@ class userController extends Controller
         return $user->toJson();
     }
 
+    public function search($name) {
+        try {
+            $users = Users::where('name', 'LIKE', '%'.$name.'%')->paginate(5, ['*'], 'page', 1);
+        } catch (Exception $e) {
+            echo $e;
+        }
+
+        return $users->toJson();
+    }
+
     public function delete($user_id) {
         Users::destroy($user_id);
         return response()->json('User deleted!');

@@ -19,6 +19,8 @@ use Illuminate\Http\Request;
 
 Route::get('registered-users/{page}', 'userController@index');
 
+Route::get('search-users/{name}', 'userController@search');
+
 Route::post('register', 'userController@register');
 
 Route::post('login', 'userController@login');

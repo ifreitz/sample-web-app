@@ -85,7 +85,7 @@ class AdminEditUser extends Component {
                     </div>
                 </div>
                 <hr className="row margin-zero"></hr>
-                <form className="registration-form z-depth-3" onSubmit={this.handleOnSubmit}>
+                <form className="registration-form z-depth-1" onSubmit={this.handleOnSubmit}>
                     <blockquote>
                         <h5>Edit User</h5>
                     </blockquote>

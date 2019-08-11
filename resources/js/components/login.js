@@ -107,10 +107,10 @@ class Login extends Component {
         return (
             <div>
                 <div className='row valign-wrapper sub-navigation'>
-                    <h6 className='header-text-margin hide-on-small-only'>Login</h6>
+                    <h6 className='header-text-margin'>Login</h6>
                 </div>
                 <hr className="row margin-zero"></hr>
-                <div className="login-forms z-depth-3">
+                <div className="login-forms z-depth-2">
                     <ul id="tabs-swipe-demo" className="tabs">
                         <li className="tab" style={tabStyle}>
                             <a className="active" href="#guest" onClick={this.handleUserType}>Guest</a>

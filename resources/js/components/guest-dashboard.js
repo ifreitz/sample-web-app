@@ -20,6 +20,7 @@ class GuestDashboard extends Component {
     }
 
     handleLogout() {
+        sessionStorage.removeItem('guest');
         this.props.history.push('/');
     }
 
@@ -136,7 +137,7 @@ class GuestDashboard extends Component {
                         <span className="waves-effect" style={{paddingLeft: '33px'}}>{this.state.description}</span>
                     </li>
                 </ul>
-                <form className="registration-form z-depth-3" onSubmit={this.handleOnSubmit}>
+                <form className="registration-form z-depth-1" onSubmit={this.handleOnSubmit}>
                     <blockquote>
                         <h5>My Information</h5>
                     </blockquote>

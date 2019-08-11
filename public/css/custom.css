@@ -59,3 +59,9 @@ body {
 .row {
     margin-bottom: 0 !important;
 }
+
+@media only screen and (max-width: 500px) {
+    .login-forms, .registration-form {
+        width: 90% !important;
+    }
+}

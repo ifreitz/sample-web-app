@@ -69,7 +69,7 @@ class Register extends Component {
         return (
             <div>
                 <div className='row valign-wrapper sub-navigation'>
-                    <h6 className='header-text-margin hide-on-small-only'>Registration</h6>
+                    <h6 className='header-text-margin'>Registration</h6>
                 </div>
                 <hr className="row margin-zero"></hr>
                 <form className="registration-form z-depth-3" onSubmit={this.handleRegistration}>

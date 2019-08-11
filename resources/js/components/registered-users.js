@@ -9,10 +9,13 @@ class RegisteredUsers extends Component {
             users: [],
             totalUsers: 0,
             numberPage: 0,
-            currentPage: 1
+            currentPage: 1,
+            search: ''
         }
 
         this.handlePaginate = this.handlePaginate.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.handleFieldChange = this.handleFieldChange.bind(this);
     }
 
     componentDidMount () {
@@ -22,6 +25,32 @@ class RegisteredUsers extends Component {
                 totalUsers: response.data.total,
                 numberPage: response.data.last_page
             })
+        });
+    }
+
+    handleSearch() {
+        if (this.state.search === '') {
+            axios.get(`/api/registered-users/${1}`).then(response => {
+                this.setState({
+                    users: response.data.data,
+                    totalUsers: response.data.total,
+                    numberPage: response.data.last_page
+                })
+            });
+        } else {
+            axios.get(`/api/search-users/${this.state.search}`).then(response => {
+                this.setState({
+                    users: response.data.data,
+                    totalUsers: response.data.total,
+                    numberPage: response.data.last_page
+                })
+            });
+        }
+    }
+
+    handleFieldChange (event) {
+        this.setState({
+            [event.target.name]: event.target.value
         });
     }
 
@@ -71,6 +100,10 @@ class RegisteredUsers extends Component {
                 </div>
                 <hr className="row margin-zero"></hr>
                 <div className="landing-page-table">
+                    <div className="row" style={{alignItems: 'center', justifyContent: 'flex-end'}}>
+                        <input placeholder="Name" id="search" name="search" type="text" className="validate" style={{width: '250px'}} value={this.state.search} onChange={this.handleFieldChange}/>
+                        <button className="waves-effect waves-dark btn white" type="submit" onClick={this.handleSearch}>&#128270;</button>
+                    </div>
                     <table className="highlight responsive-table">
                         <thead>
                             <tr>
