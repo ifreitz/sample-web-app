@@ -16,6 +16,7 @@ class RegisteredUsers extends Component {
         this.handlePaginate = this.handlePaginate.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
         this.handleFieldChange = this.handleFieldChange.bind(this);
+        this.handleSortColumnTable = this.handleSortColumnTable.bind(this);
     }
 
     componentDidMount () {
@@ -48,6 +49,55 @@ class RegisteredUsers extends Component {
         }
     }
 
+    handleSortColumnTable (event) {
+        var th = event.target;
+        var tdIndex = 0;
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("table-content");
+
+        if (th.className === "asc") {
+            th.className = "desc";
+        } else {
+            th.className = "asc";
+        }
+
+        if (th.id === "th0") {
+            tdIndex = 0;
+        } else if (th.id === "th1") {
+            tdIndex = 1;
+        } else if (th.id === "th2") {
+            tdIndex = 2;
+        } else {
+            tdIndex = 3;
+        }
+
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[tdIndex];
+                y = rows[i + 1].getElementsByTagName("TD")[tdIndex];
+                if (th.className === "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
     handleFieldChange (event) {
         this.setState({
             [event.target.name]: event.target.value
@@ -68,7 +118,7 @@ class RegisteredUsers extends Component {
                 })
             });
             this.setState({
-                currentPage: page
+                currentPage: parseInt(page)
             });
             
             $('li.active').removeClass();
@@ -101,16 +151,16 @@ class RegisteredUsers extends Component {
                 <hr className="row margin-zero"></hr>
                 <div className="landing-page-table">
                     <div className="row" style={{alignItems: 'center', justifyContent: 'flex-end'}}>
-                        <input placeholder="Name" id="search" name="search" type="text" className="validate" style={{width: '250px'}} value={this.state.search} onChange={this.handleFieldChange}/>
+                        <input placeholder="Name" id="search" name="search" type="text" className="validate" style={{width: '250px', marginRight: '5px'}} value={this.state.search} onChange={this.handleFieldChange}/>
                         <button className="waves-effect waves-dark btn white" type="submit" onClick={this.handleSearch}>&#128270;</button>
                     </div>
-                    <table className="highlight responsive-table">
+                    <table className="highlight responsive-table" id="table-content">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Gender</th>
-                                <th>Description</th>
+                                <th className="asc" id="th0" style={{cursor: "row-resize"}} onClick={this.handleSortColumnTable}>Name</th>
+                                <th className="asc" id="th1" style={{cursor: "row-resize"}} onClick={this.handleSortColumnTable}>Email</th>
+                                <th className="asc" id="th2" style={{cursor: "row-resize"}} onClick={this.handleSortColumnTable}>Gender</th>
+                                <th className="asc" id="th3" style={{cursor: "row-resize"}} onClick={this.handleSortColumnTable}>Description</th>
                             </tr>
                         </thead>
                         <tbody>

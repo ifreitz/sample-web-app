@@ -65546,6 +65546,7 @@ function (_Component) {
     _this.handlePaginate = _this.handlePaginate.bind(_assertThisInitialized(_this));
     _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
     _this.handleFieldChange = _this.handleFieldChange.bind(_assertThisInitialized(_this));
+    _this.handleSortColumnTable = _this.handleSortColumnTable.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65620,10 +65621,64 @@ function (_Component) {
           });
         });
         this.setState({
-          currentPage: page
+          currentPage: parseInt(page)
         });
         $('li.active').removeClass();
         $('li#page' + page).addClass('active');
+      }
+    }
+  }, {
+    key: "handleSortColumnTable",
+    value: function handleSortColumnTable(event) {
+      var th = event.target;
+      var tdIndex = 0;
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("my-table");
+
+      if (th.className === "asc") {
+        th.className = "desc";
+      } else {
+        th.className = "asc";
+      }
+
+      if (th.id === "th0") {
+        tdIndex = 0;
+      } else if (th.id === "th1") {
+        tdIndex = 1;
+      } else if (th.id === "th2") {
+        tdIndex = 2;
+      } else {
+        tdIndex = 3;
+      }
+
+      switching = true;
+
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 1; i < rows.length - 1; i++) {
+          shouldSwitch = false;
+          x = rows[i].getElementsByTagName("TD")[tdIndex];
+          y = rows[i + 1].getElementsByTagName("TD")[tdIndex];
+
+          if (th.className === "asc") {
+            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+              shouldSwitch = true;
+              break;
+            }
+          } else {
+            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+              shouldSwitch = true;
+              break;
+            }
+          }
+        }
+
+        if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
       }
     }
   }, {
@@ -65635,8 +65690,21 @@ function (_Component) {
   }, {
     key: "handleDeleteUser",
     value: function handleDeleteUser(id) {
+      var _this5 = this;
+
       axios__WEBPACK_IMPORTED_MODULE_0___default.a["delete"]("api/delete/".concat(id)).then(function (success) {
-        document.getElementById('table-content').removeChild(document.getElementById(id));
+        var updatedUsers = [];
+
+        _this5.state.users.map(function (user) {
+          if (user.id !== id) {
+            updatedUsers.push(user);
+          }
+        });
+
+        _this5.setState({
+          users: updatedUsers
+        });
+
         M.toast({
           html: 'User deleted!'
         });
@@ -65659,7 +65727,7 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!sessionStorage.getItem('admin')) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Redirect"], {
@@ -65775,7 +65843,8 @@ function (_Component) {
         type: "text",
         className: "validate",
         style: {
-          width: '250px'
+          width: '250px',
+          marginRight: '5px'
         },
         value: this.state.search,
         onChange: this.handleFieldChange
@@ -65784,8 +65853,37 @@ function (_Component) {
         type: "submit",
         onClick: this.handleSearch
       }, "\uD83D\uDD0E")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("table", {
+        id: "my-table",
         className: "highlight responsive-table"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Name"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Email"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Gender"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Description"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Action"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tbody", {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th0",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Name"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th1",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Email"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th2",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Gender"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th3",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Description"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Action"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tbody", {
         id: "table-content"
       }, users.map(function (user) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", {
@@ -65794,12 +65892,12 @@ function (_Component) {
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.name), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.email), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.gender), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.description), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
           className: "waves-effect waves-light btn",
           onClick: function onClick() {
-            return _this5.handleEditUser(user);
+            return _this6.handleEditUser(user);
           }
         }, "Edit"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
           className: "waves-effect waves-light btn",
           onClick: function onClick() {
-            return _this5.handleDeleteUser(user.id);
+            return _this6.handleDeleteUser(user.id);
           }
         }, "Delete")));
       }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
@@ -66638,7 +66736,7 @@ function (_Component) {
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row valign-wrapper sub-navigation"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h6", {
-        className: "header-text-margin hide-on-small-only"
+        className: "header-text-margin"
       }, "Login")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("hr", {
         className: "row margin-zero"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
@@ -66830,11 +66928,11 @@ function (_Component) {
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row valign-wrapper sub-navigation"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h6", {
-        className: "header-text-margin hide-on-small-only"
+        className: "header-text-margin"
       }, "Registration")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("hr", {
         className: "row margin-zero"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
-        className: "registration-form z-depth-3",
+        className: "registration-form z-depth-1",
         onSubmit: this.handleRegistration
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "Registration")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
@@ -66986,6 +67084,7 @@ function (_Component) {
     _this.handlePaginate = _this.handlePaginate.bind(_assertThisInitialized(_this));
     _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
     _this.handleFieldChange = _this.handleFieldChange.bind(_assertThisInitialized(_this));
+    _this.handleSortColumnTable = _this.handleSortColumnTable.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -67026,6 +67125,60 @@ function (_Component) {
       }
     }
   }, {
+    key: "handleSortColumnTable",
+    value: function handleSortColumnTable(event) {
+      var th = event.target;
+      var tdIndex = 0;
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("table-content");
+
+      if (th.className === "asc") {
+        th.className = "desc";
+      } else {
+        th.className = "asc";
+      }
+
+      if (th.id === "th0") {
+        tdIndex = 0;
+      } else if (th.id === "th1") {
+        tdIndex = 1;
+      } else if (th.id === "th2") {
+        tdIndex = 2;
+      } else {
+        tdIndex = 3;
+      }
+
+      switching = true;
+
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 1; i < rows.length - 1; i++) {
+          shouldSwitch = false;
+          x = rows[i].getElementsByTagName("TD")[tdIndex];
+          y = rows[i + 1].getElementsByTagName("TD")[tdIndex];
+
+          if (th.className === "asc") {
+            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+              shouldSwitch = true;
+              break;
+            }
+          } else {
+            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+              shouldSwitch = true;
+              break;
+            }
+          }
+        }
+
+        if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+  }, {
     key: "handleFieldChange",
     value: function handleFieldChange(event) {
       this.setState(_defineProperty({}, event.target.name, event.target.value));
@@ -67045,7 +67198,7 @@ function (_Component) {
           });
         });
         this.setState({
-          currentPage: page
+          currentPage: parseInt(page)
         });
         $('li.active').removeClass();
         $('li#' + page).addClass('active');
@@ -67115,7 +67268,8 @@ function (_Component) {
         type: "text",
         className: "validate",
         style: {
-          width: '250px'
+          width: '250px',
+          marginRight: '5px'
         },
         value: this.state.search,
         onChange: this.handleFieldChange
@@ -67124,8 +67278,37 @@ function (_Component) {
         type: "submit",
         onClick: this.handleSearch
       }, "\uD83D\uDD0E")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("table", {
-        className: "highlight responsive-table"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Name"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Email"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Gender"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", null, "Description"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tbody", null, users.map(function (user) {
+        className: "highlight responsive-table",
+        id: "table-content"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th0",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Name"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th1",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Email"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th2",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Gender"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("th", {
+        className: "asc",
+        id: "th3",
+        style: {
+          cursor: "row-resize"
+        },
+        onClick: this.handleSortColumnTable
+      }, "Description"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tbody", null, users.map(function (user) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", {
           key: user.id
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.name), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.email), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.gender), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.description));

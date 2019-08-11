@@ -82,7 +82,7 @@ class userController extends Controller
         ]);
 
         $foundUser = Users::where('email', $validateData['email'])->count();
-        if ($foundUser > 1) {
+        if ($foundUser > 0) {
             return response()->json([
                 'errors' => [
                     'email' => [
