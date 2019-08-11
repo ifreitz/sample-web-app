@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 //     return $request->user();
 // });
 
-Route::get('registered-users', 'userController@index');
+Route::get('registered-users/{page}', 'userController@index');
 
 Route::post('register', 'userController@register');
 

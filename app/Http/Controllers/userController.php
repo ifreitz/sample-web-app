@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class userController extends Controller
 {
-    public function index() {
+    public function index($page_number) {
         try {
-            $users = Users::all();
+            $users = Users::paginate(5, ['*'], 'page', $page_number);
         } catch (Exception $e) {
             echo $e;
         }

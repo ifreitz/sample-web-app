@@ -66229,19 +66229,6 @@ function (_Component) {
           paddingLeft: '33px'
         }
       }, this.state.description))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
-        className: "registration-form z-depth-3"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        "class": "file-field input-field"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        "class": "btn"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, "File"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
-        type: "file"
-      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        "class": "file-path-wrapper"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
-        "class": "file-path validate",
-        type: "text"
-      })))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         className: "registration-form z-depth-3",
         onSubmit: this.handleOnSubmit
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "My Information")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
@@ -66839,9 +66826,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
@@ -66863,8 +66850,12 @@ function (_Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(RegisteredUsers).call(this));
     _this.state = {
-      users: []
+      users: [],
+      totalUsers: 0,
+      numberPage: 0,
+      currentPage: 1
     };
+    _this.handlePaginate = _this.handlePaginate.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66873,16 +66864,67 @@ function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/registered-users').then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(1)).then(function (response) {
         _this2.setState({
-          users: response.data
+          users: response.data.data,
+          totalUsers: response.data.total,
+          numberPage: response.data.last_page
         });
       });
+    }
+  }, {
+    key: "handlePaginate",
+    value: function handlePaginate(event) {
+      var _this3 = this;
+
+      var page = event.target.innerText;
+      if (page == 'next') page = this.state.currentPage + 1;
+      if (page == 'prev') page = this.state.currentPage - 1;
+
+      if (page > 0 && page <= this.state.numberPage) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(page)).then(function (response) {
+          _this3.setState({
+            users: response.data.data
+          });
+        });
+        this.setState({
+          currentPage: page
+        });
+      }
     }
   }, {
     key: "render",
     value: function render() {
       var users = this.state.users;
+      var pagination = [];
+      pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+        key: "left"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: this.handlePaginate
+      }, "prev")));
+
+      for (var i = 1; i <= this.state.numberPage; i++) {
+        if (i == 1) pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+          className: "active",
+          key: i,
+          onClick: this.handlePaginate
+        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+          href: "#!"
+        }, i)));else pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+          key: i,
+          onClick: this.handlePaginate
+        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+          href: "#!"
+        }, i)));
+      }
+
+      pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+        key: "right"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: this.handlePaginate
+      }, "next")));
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row valign-wrapper sub-navigation"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h6", {
@@ -66905,7 +66947,13 @@ function (_Component) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("tr", {
           key: user.id
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.name), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.email), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.gender), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.description));
-      })))));
+      }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
+        className: "pagination",
+        style: {
+          marginTop: '10px',
+          justifyContent: 'center'
+        }
+      }, pagination)));
     }
   }]);
 
