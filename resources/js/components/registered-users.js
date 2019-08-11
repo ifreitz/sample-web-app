@@ -29,9 +29,9 @@ class RegisteredUsers extends Component {
         var page = event.target.innerText;
         if (page == 'next')
             page = this.state.currentPage + 1;
-        if (page == 'prev')
+        else if (page == 'prev')
             page = this.state.currentPage - 1;
-        
+            
         if (page > 0 && page <= this.state.numberPage) {
             axios.get(`/api/registered-users/${page}`).then(response => {
                 this.setState({
@@ -41,6 +41,9 @@ class RegisteredUsers extends Component {
             this.setState({
                 currentPage: page
             });
+            
+            $('li.active').removeClass();
+            $('li#'+page).addClass('active');
         }
     }
 
@@ -51,9 +54,9 @@ class RegisteredUsers extends Component {
         pagination.push(<li key="left"><a href="#!" onClick={this.handlePaginate}>prev</a></li>);
         for (var i = 1; i <= this.state.numberPage; i++) {
             if (i == 1)
-                pagination.push(<li className="active" key={i} onClick={this.handlePaginate}><a href="#!">{i}</a></li>);
+                pagination.push(<li className="active" id={i} key={i} onClick={this.handlePaginate}><a href="#!">{i}</a></li>);
             else 
-                pagination.push(<li key={i} onClick={this.handlePaginate}><a href="#!">{i}</a></li>);
+                pagination.push(<li id={i} key={i} onClick={this.handlePaginate}><a href="#!">{i}</a></li>);
         }
         pagination.push(<li key="right"><a href="#!" onClick={this.handlePaginate}>next</a></li>);
 

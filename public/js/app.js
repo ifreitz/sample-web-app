@@ -65532,11 +65532,15 @@ function (_Component) {
       description: "",
       password: "",
       deleteUserId: '',
+      totalUsers: 0,
+      numberPage: 0,
+      currentPage: 1,
       users: []
     };
     _this.handleLogout = _this.handleLogout.bind(_assertThisInitialized(_this));
     _this.handleDeleteUser = _this.handleDeleteUser.bind(_assertThisInitialized(_this));
     _this.handleEditUser = _this.handleEditUser.bind(_assertThisInitialized(_this));
+    _this.handlePaginate = _this.handlePaginate.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65558,13 +65562,36 @@ function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/registered-users').then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(1)).then(function (response) {
         _this2.setState({
-          users: response.data
+          users: response.data.data,
+          totalUsers: response.data.total,
+          numberPage: response.data.last_page
         });
       });
       var elems = document.querySelectorAll('.sidenav');
       var instances = M.Sidenav.init(elems);
+    }
+  }, {
+    key: "handlePaginate",
+    value: function handlePaginate(event) {
+      var _this3 = this;
+
+      var page = event.target.innerText;
+      if (page == 'next') page = this.state.currentPage + 1;else if (page == 'prev') page = this.state.currentPage - 1;
+
+      if (page > 0 && page <= this.state.numberPage) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(page)).then(function (response) {
+          _this3.setState({
+            users: response.data.data
+          });
+        });
+        this.setState({
+          currentPage: page
+        });
+        $('li.active').removeClass();
+        $('li#page' + page).addClass('active');
+      }
     }
   }, {
     key: "handleLogout",
@@ -65599,7 +65626,7 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!sessionStorage.getItem('admin')) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Redirect"], {
@@ -65608,6 +65635,37 @@ function (_Component) {
       }
 
       var users = this.state.users;
+      var pagination = [];
+      pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+        key: "left"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: this.handlePaginate
+      }, "prev")));
+
+      for (var i = 1; i <= this.state.numberPage; i++) {
+        if (i == 1) pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+          className: "active",
+          id: "page" + i,
+          key: i,
+          onClick: this.handlePaginate
+        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+          href: "#!"
+        }, i)));else pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+          id: "page" + i,
+          key: i,
+          onClick: this.handlePaginate
+        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+          href: "#!"
+        }, i)));
+      }
+
+      pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+        key: "right"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
+        href: "#!",
+        onClick: this.handlePaginate
+      }, "next")));
       return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row valign-wrapper sub-navigation"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
@@ -65676,15 +65734,21 @@ function (_Component) {
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.name), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.email), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.gender), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, user.description), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
           className: "waves-effect waves-light btn",
           onClick: function onClick() {
-            return _this3.handleEditUser(user);
+            return _this4.handleEditUser(user);
           }
         }, "Edit"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
           className: "waves-effect waves-light btn",
           onClick: function onClick() {
-            return _this3.handleDeleteUser(user.id);
+            return _this4.handleDeleteUser(user.id);
           }
         }, "Delete")));
-      })))));
+      }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("ul", {
+        className: "pagination",
+        style: {
+          marginTop: '10px',
+          justifyContent: 'center'
+        }
+      }, pagination)));
     }
   }]);
 
@@ -66878,8 +66942,7 @@ function (_Component) {
       var _this3 = this;
 
       var page = event.target.innerText;
-      if (page == 'next') page = this.state.currentPage + 1;
-      if (page == 'prev') page = this.state.currentPage - 1;
+      if (page == 'next') page = this.state.currentPage + 1;else if (page == 'prev') page = this.state.currentPage - 1;
 
       if (page > 0 && page <= this.state.numberPage) {
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/registered-users/".concat(page)).then(function (response) {
@@ -66890,6 +66953,8 @@ function (_Component) {
         this.setState({
           currentPage: page
         });
+        $('li.active').removeClass();
+        $('li#' + page).addClass('active');
       }
     }
   }, {
@@ -66907,11 +66972,13 @@ function (_Component) {
       for (var i = 1; i <= this.state.numberPage; i++) {
         if (i == 1) pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
           className: "active",
+          id: i,
           key: i,
           onClick: this.handlePaginate
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
           href: "#!"
         }, i)));else pagination.push(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", {
+          id: i,
           key: i,
           onClick: this.handlePaginate
         }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
