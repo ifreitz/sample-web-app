@@ -13,6 +13,16 @@ Integrate laravel Rest API's.
 
 I may not include image manipulation because of the type of database I used which is SQLITE.
 
+Install Node Package Manager
+
+> npm install
+
+Update .env file
+
+DB_CONNECTION=sqlite
+
+DB_DATABASE=database\database.sqlite
+
 Execute these commands to run the application:
 
 > sudo npm run dev
