@@ -40,10 +40,10 @@ class Login extends Component {
 
         axios.post('api/login', user).then(response => {
             if (this.state.user === 'admin') {
-                sessionStorage.setItem('admin', JSON.stringify(response.data[0]));
+                localStorage.setItem('admin', JSON.stringify(response.data[0]));
                 history.push('/admin');
             } else {
-                sessionStorage.setItem('guest', JSON.stringify(response.data[0]));
+                localStorage.setItem('guest', JSON.stringify(response.data[0]));
                 history.push('/guest');
             }
         }).catch(error => {

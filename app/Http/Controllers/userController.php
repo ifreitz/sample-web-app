@@ -91,13 +91,21 @@ class userController extends Controller
                 ]
             ], 422);
         }
+
+        $images = "";
+        if ($request->hasFile('file')) {
+            $images = $request->file->getClientOriginalName();
+            $images = time().'_'.$images;
+            $request->file->storeAs('public/images/profiles', $images);
+        }
         
         $user = Users::create([
             'name' => $validateData['name'],
             'email' => $validateData['email'],
             'password' => $validateData['password'],
             'gender' => $validateData['gender'],
-            'description' => $validateData['description']
+            'description' => $validateData['description'],
+            'profile_pic' => $images
         ]);
 
         return $user->toJson();

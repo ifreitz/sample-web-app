@@ -65553,8 +65553,8 @@ function (_Component) {
   _createClass(AdminDashboard, [{
     key: "componentWillMount",
     value: function componentWillMount() {
-      if (sessionStorage.getItem('admin')) {
-        var user = JSON.parse(sessionStorage.getItem('admin'));
+      if (localStorage.getItem('admin')) {
+        var user = JSON.parse(localStorage.getItem('admin'));
         this.state.id = user.id;
         this.state.name = user.name;
         this.state.email = user.email;
@@ -65684,7 +65684,7 @@ function (_Component) {
   }, {
     key: "handleLogout",
     value: function handleLogout(event) {
-      sessionStorage.removeItem('admin');
+      localStorage.removeItem('admin');
       this.props.history.push('/');
     }
   }, {
@@ -65729,7 +65729,7 @@ function (_Component) {
     value: function render() {
       var _this6 = this;
 
-      if (!sessionStorage.getItem('admin')) {
+      if (!localStorage.getItem('admin')) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Redirect"], {
           to: "/login"
         });
@@ -66302,6 +66302,7 @@ function (_Component) {
       gender: "",
       description: "",
       password: "",
+      profile_pic: "",
       errors: []
     };
     _this.handleLogout = _this.handleLogout.bind(_assertThisInitialized(_this));
@@ -66311,26 +66312,28 @@ function (_Component) {
   _createClass(GuestDashboard, [{
     key: "handleLogout",
     value: function handleLogout() {
-      sessionStorage.removeItem('guest');
+      localStorage.removeItem('guest');
       this.props.history.push('/');
     }
   }, {
     key: "componentWillMount",
     value: function componentWillMount() {
-      if (sessionStorage.getItem('guest')) {
-        var user = JSON.parse(sessionStorage.getItem('guest'));
+      if (localStorage.getItem('guest')) {
+        var user = JSON.parse(localStorage.getItem('guest'));
         this.state.id = user.id;
         this.state.name = user.name;
         this.state.email = user.email;
         this.state.password = user.password;
         this.state.description = user.description;
         this.state.gender = user.gender;
+        this.state.profile_pic = user.profile_pic;
       }
 
       this.handleFieldChange = this.handleFieldChange.bind(this);
       this.handleOnSubmit = this.handleOnSubmit.bind(this);
       this.hasErrorFor = this.hasErrorFor.bind(this);
       this.renderErrorFor = this.renderErrorFor.bind(this);
+      this.handleFileChange = this.handleFileChange.bind(this);
     }
   }, {
     key: "componentDidMount",
@@ -66342,6 +66345,11 @@ function (_Component) {
     key: "handleFieldChange",
     value: function handleFieldChange(event) {
       this.setState(_defineProperty({}, event.target.name, event.target.value));
+    }
+  }, {
+    key: "handleFileChange",
+    value: function handleFileChange(event) {
+      this.setState(_defineProperty({}, event.target.name, event.target.files[0]));
     }
   }, {
     key: "hasErrorFor",
@@ -66390,7 +66398,7 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      if (!sessionStorage.getItem('guest')) {
+      if (!localStorage.getItem('guest')) {
         return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Redirect"], {
           to: "/login"
         });
@@ -66427,8 +66435,10 @@ function (_Component) {
         href: "#user"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
         className: "circle",
+        src: "storage/images/profiles/" + this.state.profile_pic,
         style: {
-          background: 'white'
+          background: 'white',
+          objectFit: 'cover'
         }
       })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "#name"
@@ -66449,7 +66459,7 @@ function (_Component) {
       }, "Description")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("li", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
         className: "waves-effect",
         style: {
-          paddingLeft: '33px'
+          padding: '0 33px'
         }
       }, this.state.description))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         className: "registration-form z-depth-1",
@@ -66530,10 +66540,31 @@ function (_Component) {
         value: "Male"
       }, "Male"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("option", {
         value: "Female"
-      }, "Female")), this.renderErrorFor('gender'))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      }, "Female")), this.renderErrorFor('gender'))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "file-field input-field",
+        style: {
+          padding: '0 11px'
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "btn"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, "Update Pic"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        id: "file",
+        type: "file",
+        name: "file",
+        accept: "image/x-png,image/jpeg",
+        onChange: this.handleFileChange
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "file-path-wrapper"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        className: "file-path validate",
+        type: "text"
+      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "waves-effect waves-light btn registration-form-button",
-        type: "submit"
-      }, "submit")));
+        type: "submit",
+        style: {
+          width: '95%'
+        }
+      }, "update")));
     }
   }]);
 
@@ -66656,10 +66687,10 @@ function (_Component) {
       };
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/login', user).then(function (response) {
         if (_this2.state.user === 'admin') {
-          sessionStorage.setItem('admin', JSON.stringify(response.data[0]));
+          localStorage.setItem('admin', JSON.stringify(response.data[0]));
           history.push('/admin');
         } else {
-          sessionStorage.setItem('guest', JSON.stringify(response.data[0]));
+          localStorage.setItem('guest', JSON.stringify(response.data[0]));
           history.push('/guest');
         }
       })["catch"](function (error) {
@@ -66866,12 +66897,14 @@ function (_Component) {
       password: '',
       gender: '',
       description: '',
+      file: [],
       errors: []
     };
     _this.handleFieldChange = _this.handleFieldChange.bind(_assertThisInitialized(_this));
     _this.handleRegistration = _this.handleRegistration.bind(_assertThisInitialized(_this));
     _this.hasErrorFor = _this.hasErrorFor.bind(_assertThisInitialized(_this));
     _this.renderErrorFor = _this.renderErrorFor.bind(_assertThisInitialized(_this));
+    _this.handleFileChange = _this.handleFileChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66879,6 +66912,11 @@ function (_Component) {
     key: "handleFieldChange",
     value: function handleFieldChange(event) {
       this.setState(_defineProperty({}, event.target.name, event.target.value));
+    }
+  }, {
+    key: "handleFileChange",
+    value: function handleFileChange(event) {
+      this.setState(_defineProperty({}, event.target.name, event.target.files[0]));
     }
   }, {
     key: "hasErrorFor",
@@ -66901,14 +66939,18 @@ function (_Component) {
 
       event.preventDefault();
       var history = this.props.history;
-      var user = {
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password,
-        gender: this.state.gender,
-        description: this.state.description
-      };
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/register', user).then(function (response) {
+      var form = new FormData();
+      form.append('name', this.state.name);
+      form.append('email', this.state.email);
+      form.append('password', this.state.password);
+      form.append('gender', this.state.gender);
+      form.append('description', this.state.description);
+      form.append('file', this.state.file);
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/register', form, {
+        headers: {
+          'content-type': "multipart/form-data; boundary=".concat(form._boundary)
+        }
+      }).then(function (response) {
         history.push('/');
       })["catch"](function (error) {
         if (error.response.status == 422) {
@@ -66933,6 +66975,7 @@ function (_Component) {
         className: "row margin-zero"
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         className: "registration-form z-depth-1",
+        id: "form",
         onSubmit: this.handleRegistration
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "Registration")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
@@ -67006,7 +67049,25 @@ function (_Component) {
         value: "Male"
       }, "Male"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("option", {
         value: "Female"
-      }, "Female")), this.renderErrorFor('gender'))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      }, "Female")), this.renderErrorFor('gender'))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "file-field input-field",
+        style: {
+          padding: '0 11px'
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "btn"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, "Profile Pic"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        id: "file",
+        type: "file",
+        name: "file",
+        accept: "image/x-png,image/jpeg",
+        onChange: this.handleFileChange
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "file-path-wrapper"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        className: "file-path validate",
+        type: "text"
+      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "waves-effect waves-light btn registration-form-button",
         type: "submit"
       }, "submit"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {

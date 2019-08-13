@@ -13,6 +13,7 @@ class GuestDashboard extends Component {
             gender: "",
             description: "",
             password: "",
+            profile_pic: "",
             errors: []
         }
 
@@ -20,25 +21,27 @@ class GuestDashboard extends Component {
     }
 
     handleLogout() {
-        sessionStorage.removeItem('guest');
+        localStorage.removeItem('guest');
         this.props.history.push('/');
     }
 
     componentWillMount() {
-        if (sessionStorage.getItem('guest')) {
-            var user = JSON.parse(sessionStorage.getItem('guest'));
+        if (localStorage.getItem('guest')) {
+            var user = JSON.parse(localStorage.getItem('guest'));
             this.state.id = user.id;
             this.state.name = user.name;
             this.state.email = user.email;
             this.state.password = user.password;
             this.state.description = user.description;
             this.state.gender = user.gender;
+            this.state.profile_pic = user.profile_pic;
         }
 
         this.handleFieldChange = this.handleFieldChange.bind(this);
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
         this.hasErrorFor = this.hasErrorFor.bind(this);
         this.renderErrorFor = this.renderErrorFor.bind(this);
+        this.handleFileChange = this.handleFileChange.bind(this);
     }
 
     componentDidMount() {
@@ -49,6 +52,12 @@ class GuestDashboard extends Component {
     handleFieldChange (event) {
         this.setState({
             [event.target.name]: event.target.value
+        });
+    }
+
+    handleFileChange (event) {
+        this.setState({
+            [event.target.name]: event.target.files[0]
         });
     }
 
@@ -92,7 +101,7 @@ class GuestDashboard extends Component {
     }
 
     render(){
-        if (!sessionStorage.getItem('guest')) {
+        if (!localStorage.getItem('guest')) {
             return <Redirect to='/login'/>
         }
         return(
@@ -111,7 +120,7 @@ class GuestDashboard extends Component {
                             <div className="background" style={{background: 'indianred'}}>
                             </div>
                             <a href="#user">
-                                <img className="circle" style={{background: 'white'}} />
+                                <img className="circle" src={"storage/images/profiles/" + this.state.profile_pic} style={{background: 'white', objectFit: 'cover'}} />
                             </a>
                             <a href="#name">
                                 <span className="white-text name">{this.state.name}</span>
@@ -134,7 +143,7 @@ class GuestDashboard extends Component {
                         <a className="subheader">Description</a>
                     </li>
                     <li>
-                        <span className="waves-effect" style={{paddingLeft: '33px'}}>{this.state.description}</span>
+                        <span className="waves-effect" style={{padding: '0 33px'}}>{this.state.description}</span>
                     </li>
                 </ul>
                 <form className="registration-form z-depth-1" onSubmit={this.handleOnSubmit}>
@@ -179,7 +188,17 @@ class GuestDashboard extends Component {
                             {this.renderErrorFor('gender')}
                         </div>
                     </div>
-                    <button className="waves-effect waves-light btn registration-form-button" type="submit">submit</button>
+                    <div className="file-field input-field" style={{padding: '0 11px'}}>
+                        <div className="btn">
+                            <span>Update Pic</span>
+                            <input id="file" type="file" name="file" accept="image/x-png,image/jpeg" onChange={this.handleFileChange}/>
+                        </div>
+                        <div className="file-path-wrapper">
+                            <input className="file-path validate" type="text"/>
+                        </div>
+                        {this.renderErrorFor('file')}
+                    </div>
+                    <button className="waves-effect waves-light btn registration-form-button" type="submit" style={{width: '95%'}}>update</button>
                 </form>
             </div>
         );

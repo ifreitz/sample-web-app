@@ -30,8 +30,8 @@ class AdminDashboard extends Component {
     }
 
     componentWillMount() {
-        if (sessionStorage.getItem('admin')) {
-            var user = JSON.parse(sessionStorage.getItem('admin'));
+        if (localStorage.getItem('admin')) {
+            var user = JSON.parse(localStorage.getItem('admin'));
             this.state.id = user.id;
             this.state.name = user.name;
             this.state.email = user.email;
@@ -151,7 +151,7 @@ class AdminDashboard extends Component {
     }
 
     handleLogout(event) {
-        sessionStorage.removeItem('admin');
+        localStorage.removeItem('admin');
         this.props.history.push('/');
     }
 
@@ -182,7 +182,7 @@ class AdminDashboard extends Component {
     }
     
     render() {
-        if (!sessionStorage.getItem('admin')) {
+        if (!localStorage.getItem('admin')) {
             return <Redirect to='/login'/>
         }
 

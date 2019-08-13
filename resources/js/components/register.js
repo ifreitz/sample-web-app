@@ -11,6 +11,7 @@ class Register extends Component {
             password: '',
             gender: '',
             description: '',
+            file: [],
             errors: []
         };
         
@@ -18,11 +19,18 @@ class Register extends Component {
         this.handleRegistration = this.handleRegistration.bind(this);
         this.hasErrorFor = this.hasErrorFor.bind(this);
         this.renderErrorFor = this.renderErrorFor.bind(this);
+        this.handleFileChange = this.handleFileChange.bind(this);
     }
 
     handleFieldChange (event) {
         this.setState({
             [event.target.name]: event.target.value
+        });
+    }
+
+    handleFileChange (event) {
+        this.setState({
+            [event.target.name]: event.target.files[0]
         });
     }
 
@@ -44,15 +52,18 @@ class Register extends Component {
         event.preventDefault();
 
         const { history } = this.props;
-        const user = {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password,
-            gender: this.state.gender,
-            description: this.state.description
-        }
+        const form = new FormData();
+        
+        form.append('name', this.state.name);
+        form.append('email', this.state.email);
+        form.append('password', this.state.password);
+        form.append('gender', this.state.gender);
+        form.append('description', this.state.description);
+        form.append('file', this.state.file);
 
-        axios.post('api/register', user).then(response => {
+        axios.post('api/register', form, { headers: {
+            'content-type': `multipart/form-data; boundary=${form._boundary}`,
+          }}).then(response => {
             history.push('/');
         }).catch(error => {
             if (error.response.status == 422) {
@@ -72,7 +83,7 @@ class Register extends Component {
                     <h6 className='header-text-margin'>Registration</h6>
                 </div>
                 <hr className="row margin-zero"></hr>
-                <form className="registration-form z-depth-1" onSubmit={this.handleRegistration}>
+                <form className="registration-form z-depth-1" id="form" onSubmit={this.handleRegistration}>
                     <blockquote>
                         <h5>Registration</h5>
                     </blockquote>
@@ -113,6 +124,16 @@ class Register extends Component {
                             </select>
                             {this.renderErrorFor('gender')}
                         </div>
+                    </div>
+                    <div className="file-field input-field" style={{padding: '0 11px'}}>
+                        <div className="btn">
+                            <span>Profile Pic</span>
+                            <input id="file" type="file" name="file" accept="image/x-png,image/jpeg" onChange={this.handleFileChange}/>
+                        </div>
+                        <div className="file-path-wrapper">
+                            <input className="file-path validate" type="text"/>
+                        </div>
+                        {this.renderErrorFor('file')}
                     </div>
                     <button className="waves-effect waves-light btn registration-form-button" type="submit">submit</button>
                     <Link className="waves-effect waves-light btn registration-form-button" to='/'>Cancel</Link>
