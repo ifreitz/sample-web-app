@@ -11,8 +11,6 @@ User details:
 This project is a Single Page Application.
 Integrate laravel Rest API's.
 
-I may not include image manipulation because of the type of database I used which is SQLITE.
-
 Install Node Package Manager
 
 > npm install
