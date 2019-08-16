@@ -12,6 +12,8 @@ class AdminEditUser extends Component {
             password: '',
             description: '',
             gender: '',
+            Profile_pic: '',
+            file: [],
             errors: []
         }
 
@@ -19,6 +21,7 @@ class AdminEditUser extends Component {
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
         this.hasErrorFor = this.hasErrorFor.bind(this);
         this.renderErrorFor = this.renderErrorFor.bind(this);
+        this.handleFileChange = this.handleFileChange.bind(this);
     }
 
     componentWillMount() {
@@ -28,12 +31,25 @@ class AdminEditUser extends Component {
         this.state.password = this.props.location.state.user.password;
         this.state.description = this.props.location.state.user.description;
         this.state.gender = this.props.location.state.user.gender;
+        this.state.profile_pic = this.props.location.state.user.profile_pic;
     }
 
     handleFieldChange (event) {
         this.setState({
             [event.target.name]: event.target.value
         });
+    }
+
+    handleFileChange (event) {
+        this.setState({
+            [event.target.name]: event.target.files[0]
+        });
+        if (event.target.files.length > 0) {
+            $("#img_prev").attr("src", URL.createObjectURL(event.target.files[0]));
+            $("#img_prev_con").show();
+        } else {
+            $("#img_prev_con").hide();
+        }
     }
 
     hasErrorFor (field) {
@@ -53,17 +69,27 @@ class AdminEditUser extends Component {
     handleOnSubmit (event) {
         event.preventDefault();
 
-        const user = {
-            id: this.state.id,
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password,
-            gender: this.state.gender,
-            description: this.state.description
-        }
+        const form = new FormData();
+        form.append('id', this.state.id);
+        form.append('name', this.state.name);
+        form.append('email', this.state.email);
+        form.append('password', this.state.password);
+        form.append('gender', this.state.gender);
+        form.append('description', this.state.description);
+        form.append('file', this.state.file);
 
-        axios.post('api/update-user', user).then(response => {
-            M.toast({html: 'Updated'})
+        axios.post('api/update-user', form, { headers: {
+            'content-type': `multipart/form-data; boundary=${form._boundary}`
+        }}).then(response => {
+            M.toast({html: 'Updated'});
+            this.setState({
+                name: response.data.name,
+                email: response.data.email,
+                password: response.data.password,
+                gender: response.data.gender,
+                description: response.data.description,
+                profile_pic: response.data.profile_pic
+            });
         }).catch(error => {
             if (error.response.status == 422) {
                 this.setState({
@@ -89,6 +115,9 @@ class AdminEditUser extends Component {
                     <blockquote>
                         <h5>Edit User</h5>
                     </blockquote>
+                    <div className="row" style={{justifyContent: "center"}}>
+                        <img className="circle" src={"storage/images/profiles/" + this.state.profile_pic} alt="" style={{background: 'lavender', objectFit: 'cover', width: '100px', height: '100px'}} />
+                    </div>
                     <div className="row">
                         <div className="input-field col s12">
                             <input id="name" type="text" className="validate" name='name' value={this.state.name} onChange={this.handleFieldChange} required/>
@@ -126,6 +155,19 @@ class AdminEditUser extends Component {
                             </select>
                             {this.renderErrorFor('gender')}
                         </div>
+                    </div>
+                    <div className="file-field input-field" style={{padding: '0 11px'}}>
+                        <div className="btn">
+                            <span>Profile Pic</span>
+                            <input id="file" type="file" name="file" accept="image/x-png,image/jpeg" onChange={this.handleFileChange}/>
+                        </div>
+                        <div className="file-path-wrapper">
+                            <input className="file-path validate" type="text"/>
+                        </div>
+                        {this.renderErrorFor('file')}
+                    </div>
+                    <div id="img_prev_con" className="row" style={{justifyContent: "center", display: "none"}}>
+                        <img id="img_prev" className="circle" alt="" style={{background: 'lavender', objectFit: 'cover', width: '100px', height: '100px'}} />
                     </div>
                     <button className="waves-effect waves-light btn registration-form-button" type="submit">submit</button>
                     <Link className="waves-effect waves-light btn registration-form-button" to='/admin'>Cancel</Link>

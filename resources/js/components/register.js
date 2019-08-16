@@ -32,6 +32,12 @@ class Register extends Component {
         this.setState({
             [event.target.name]: event.target.files[0]
         });
+        if (event.target.files.length > 0) {
+            $("#img_prev").attr("src", URL.createObjectURL(event.target.files[0]));
+            $("#img_prev_con").show();
+        } else {
+            $("#img_prev_con").hide();
+        }
     }
 
     hasErrorFor (field) {
@@ -134,6 +140,9 @@ class Register extends Component {
                             <input className="file-path validate" type="text"/>
                         </div>
                         {this.renderErrorFor('file')}
+                    </div>
+                    <div id="img_prev_con" className="row" style={{justifyContent: "center", display: "none"}}>
+                        <img id="img_prev" className="circle" alt="" style={{background: 'lavender', objectFit: 'cover', width: '100px', height: '100px'}} />
                     </div>
                     <button className="waves-effect waves-light btn registration-form-button" type="submit">submit</button>
                     <Link className="waves-effect waves-light btn registration-form-button" to='/'>Cancel</Link>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Users;
 use App\Admins;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class userController extends Controller
 {
@@ -67,8 +68,19 @@ class userController extends Controller
         $user->password = $validateData['password'];
         $user->gender = $validateData['gender'];
         $user->description = $validateData['description'];
-        $user->save();
+        
+        $images = $user->profile_pic;
+        if ($request->hasFile('file')) {
+            if ($user->profile_pic != "") {
+                Storage::delete('public/images/profiles/' . $user->profile_pic);
+            }
+            $images = $request->file->getClientOriginalName();
+            $images = time() .'_' . preg_replace("/[^a-z0-9\_\-\.]/i", "", $images);
+            $request->file->storeAs('public/images/profiles', $images);
+            $user->profile_pic = $images;
+        }
 
+        $user->save();
         return $user->toJson();
     }
 
@@ -95,7 +107,7 @@ class userController extends Controller
         $images = "";
         if ($request->hasFile('file')) {
             $images = $request->file->getClientOriginalName();
-            $images = time().'_'.$images;
+            $images = time().'_' . preg_replace("/[^a-z0-9\_\-\.]/i", "", $images);
             $request->file->storeAs('public/images/profiles', $images);
         }
         
@@ -122,6 +134,10 @@ class userController extends Controller
     }
 
     public function delete($user_id) {
+        $user = Users::find($user_id);
+        if ($user->profile_pic != "") {
+            Storage::delete('public/images/profiles/' . $user->profile_pic);
+        }
         Users::destroy($user_id);
         return response()->json('User deleted!');
     }

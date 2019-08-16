@@ -65973,12 +65973,15 @@ function (_Component) {
       password: '',
       description: '',
       gender: '',
+      Profile_pic: '',
+      file: [],
       errors: []
     };
     _this.handleFieldChange = _this.handleFieldChange.bind(_assertThisInitialized(_this));
     _this.handleOnSubmit = _this.handleOnSubmit.bind(_assertThisInitialized(_this));
     _this.hasErrorFor = _this.hasErrorFor.bind(_assertThisInitialized(_this));
     _this.renderErrorFor = _this.renderErrorFor.bind(_assertThisInitialized(_this));
+    _this.handleFileChange = _this.handleFileChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -65991,11 +65994,24 @@ function (_Component) {
       this.state.password = this.props.location.state.user.password;
       this.state.description = this.props.location.state.user.description;
       this.state.gender = this.props.location.state.user.gender;
+      this.state.profile_pic = this.props.location.state.user.profile_pic;
     }
   }, {
     key: "handleFieldChange",
     value: function handleFieldChange(event) {
       this.setState(_defineProperty({}, event.target.name, event.target.value));
+    }
+  }, {
+    key: "handleFileChange",
+    value: function handleFileChange(event) {
+      this.setState(_defineProperty({}, event.target.name, event.target.files[0]));
+
+      if (event.target.files.length > 0) {
+        $("#img_prev").attr("src", URL.createObjectURL(event.target.files[0]));
+        $("#img_prev_con").show();
+      } else {
+        $("#img_prev_con").hide();
+      }
     }
   }, {
     key: "hasErrorFor",
@@ -66017,17 +66033,30 @@ function (_Component) {
       var _this2 = this;
 
       event.preventDefault();
-      var user = {
-        id: this.state.id,
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password,
-        gender: this.state.gender,
-        description: this.state.description
-      };
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/update-user', user).then(function (response) {
+      var form = new FormData();
+      form.append('id', this.state.id);
+      form.append('name', this.state.name);
+      form.append('email', this.state.email);
+      form.append('password', this.state.password);
+      form.append('gender', this.state.gender);
+      form.append('description', this.state.description);
+      form.append('file', this.state.file);
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/update-user', form, {
+        headers: {
+          'content-type': "multipart/form-data; boundary=".concat(form._boundary)
+        }
+      }).then(function (response) {
         M.toast({
           html: 'Updated'
+        });
+
+        _this2.setState({
+          name: response.data.name,
+          email: response.data.email,
+          password: response.data.password,
+          gender: response.data.gender,
+          description: response.data.description,
+          profile_pic: response.data.profile_pic
         });
       })["catch"](function (error) {
         if (error.response.status == 422) {
@@ -66059,6 +66088,21 @@ function (_Component) {
         className: "registration-form z-depth-1",
         onSubmit: this.handleOnSubmit
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "Edit User")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "row",
+        style: {
+          justifyContent: "center"
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
+        className: "circle",
+        src: "storage/images/profiles/" + this.state.profile_pic,
+        alt: "",
+        style: {
+          background: 'lavender',
+          objectFit: 'cover',
+          width: '100px',
+          height: '100px'
+        }
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "input-field col s12"
@@ -66134,7 +66178,42 @@ function (_Component) {
         value: "Male"
       }, "Male"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("option", {
         value: "Female"
-      }, "Female")), this.renderErrorFor('gender'))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      }, "Female")), this.renderErrorFor('gender'))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "file-field input-field",
+        style: {
+          padding: '0 11px'
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "btn"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, "Profile Pic"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        id: "file",
+        type: "file",
+        name: "file",
+        accept: "image/x-png,image/jpeg",
+        onChange: this.handleFileChange
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "file-path-wrapper"
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        className: "file-path validate",
+        type: "text"
+      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        id: "img_prev_con",
+        className: "row",
+        style: {
+          justifyContent: "center",
+          display: "none"
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
+        id: "img_prev",
+        className: "circle",
+        alt: "",
+        style: {
+          background: 'lavender',
+          objectFit: 'cover',
+          width: '100px',
+          height: '100px'
+        }
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "waves-effect waves-light btn registration-form-button",
         type: "submit"
       }, "submit"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {
@@ -66303,9 +66382,11 @@ function (_Component) {
       description: "",
       password: "",
       profile_pic: "",
+      file: [],
       errors: []
     };
     _this.handleLogout = _this.handleLogout.bind(_assertThisInitialized(_this));
+    _this.handleFileChange = _this.handleFileChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -66350,6 +66431,13 @@ function (_Component) {
     key: "handleFileChange",
     value: function handleFileChange(event) {
       this.setState(_defineProperty({}, event.target.name, event.target.files[0]));
+
+      if (event.target.files.length > 0) {
+        $("#img_prev").attr("src", URL.createObjectURL(event.target.files[0]));
+        $("#img_prev_con").show();
+      } else {
+        $("#img_prev_con").hide();
+      }
     }
   }, {
     key: "hasErrorFor",
@@ -66371,17 +66459,31 @@ function (_Component) {
       var _this2 = this;
 
       event.preventDefault();
-      var user = {
-        id: this.state.id,
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password,
-        gender: this.state.gender,
-        description: this.state.description
-      };
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/update-user', user).then(function (response) {
+      var form = new FormData();
+      form.append('id', this.state.id);
+      form.append('name', this.state.name);
+      form.append('email', this.state.email);
+      form.append('password', this.state.password);
+      form.append('gender', this.state.gender);
+      form.append('description', this.state.description);
+      form.append('file', this.state.file);
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/update-user', form, {
+        headers: {
+          'content-type': "multipart/form-data; boundary=".concat(form._boundary)
+        }
+      }).then(function (response) {
         M.toast({
           html: 'Updated'
+        });
+        localStorage.setItem('guest', response.data);
+
+        _this2.setState({
+          name: response.data.name,
+          email: response.data.email,
+          password: response.data.password,
+          gender: response.data.gender,
+          description: response.data.description,
+          profile_pic: response.data.profile_pic
         });
       })["catch"](function (error) {
         if (error.response.status == 422) {
@@ -66436,6 +66538,7 @@ function (_Component) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
         className: "circle",
         src: "storage/images/profiles/" + this.state.profile_pic,
+        alt: "",
         style: {
           background: 'white',
           objectFit: 'cover'
@@ -66465,6 +66568,21 @@ function (_Component) {
         className: "registration-form z-depth-1",
         onSubmit: this.handleOnSubmit
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("blockquote", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h5", null, "My Information")), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "row",
+        style: {
+          justifyContent: "center"
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
+        className: "circle",
+        src: "storage/images/profiles/" + this.state.profile_pic,
+        alt: "",
+        style: {
+          background: 'lavender',
+          objectFit: 'cover',
+          width: '100px',
+          height: '100px'
+        }
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "input-field col s12"
@@ -66558,7 +66676,24 @@ function (_Component) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         className: "file-path validate",
         type: "text"
-      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        id: "img_prev_con",
+        className: "row",
+        style: {
+          justifyContent: "center",
+          display: "none"
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
+        id: "img_prev",
+        className: "circle",
+        alt: "",
+        style: {
+          background: 'lavender',
+          objectFit: 'cover',
+          width: '100px',
+          height: '100px'
+        }
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "waves-effect waves-light btn registration-form-button",
         type: "submit",
         style: {
@@ -66917,6 +67052,13 @@ function (_Component) {
     key: "handleFileChange",
     value: function handleFileChange(event) {
       this.setState(_defineProperty({}, event.target.name, event.target.files[0]));
+
+      if (event.target.files.length > 0) {
+        $("#img_prev").attr("src", URL.createObjectURL(event.target.files[0]));
+        $("#img_prev_con").show();
+      } else {
+        $("#img_prev_con").hide();
+      }
     }
   }, {
     key: "hasErrorFor",
@@ -67067,7 +67209,24 @@ function (_Component) {
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         className: "file-path validate",
         type: "text"
-      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      })), this.renderErrorFor('file')), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        id: "img_prev_con",
+        className: "row",
+        style: {
+          justifyContent: "center",
+          display: "none"
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
+        id: "img_prev",
+        className: "circle",
+        alt: "",
+        style: {
+          background: 'lavender',
+          objectFit: 'cover',
+          width: '100px',
+          height: '100px'
+        }
+      })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
         className: "waves-effect waves-light btn registration-form-button",
         type: "submit"
       }, "submit"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {
